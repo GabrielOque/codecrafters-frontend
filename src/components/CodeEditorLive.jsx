@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LiveProvider, LiveEditor, LivePreview } from "react-live";
+import { LiveProvider, LiveEditor, LivePreview, LiveError } from "react-live";
 import { fusionAndCompare, countLines } from "../helpers";
 
 const CodeEditorLive = ({
@@ -8,6 +8,8 @@ const CodeEditorLive = ({
   answer,
   description,
   title,
+  level,
+  points,
 }) => {
   const data = values;
   const [code, setCode] = useState(initialConfig);
@@ -21,10 +23,11 @@ const CodeEditorLive = ({
       console.log = (message) => {
         if (typeof message === "object" || Array.isArray(message)) {
           capturedOutput += JSON.stringify(message, null, 2);
-          setOriginalData(message);
-        } else {
+          setOriginalData(() => message);
+        }
+        else {
           capturedOutput += `${message}`;
-          setOriginalData(message);
+          setOriginalData(() => message);
         }
       };
 
@@ -32,11 +35,25 @@ const CodeEditorLive = ({
 
       console.log = originalLog;
 
-      setOutput(capturedOutput);
+      setOutput(() => capturedOutput);
     } catch (error) {
       console.error("Error al ejecutar el código:", error);
     }
   };
+
+  const handleBlur = (event) => {
+    const editorValue = event.target.textContent; // Obtener el contenido del editor
+    const lines = editorValue.split('\n'); // Dividir el texto en líneas
+
+    // Eliminar la última línea si está vacía (es decir, si es un salto de línea)
+    if (lines[lines.length - 1].trim() === '') {
+      lines.pop(); // Eliminar la última línea
+    }
+
+    const newValue = lines.join('\n'); // Unir las líneas nuevamente en un solo texto
+    setCode(() => newValue); // Actualizar el estado con el valor del editor
+  };
+
 
   return (
     <div className="mb-36 w-full flex flex-col items-center">
@@ -50,16 +67,21 @@ const CodeEditorLive = ({
           />
         </div>
         <p>{description}</p>
-        <div className="w-full text-center mb-2 mt-3">
+        <div className="mt-2 text-amber-500">
+          <p>Nivel: {level}</p>
+          <p>Puntos: {points}</p>
+        </div>
+        <div className="w-full text-center mb-2 ">
           <i className="fas fa-arrow-down text-4xl text-amber-500 cursor-pointer inline-block animate-bounce" />
         </div>
       </div>
       <div className="lg:w-1/2 w-full">
         <LiveProvider code={code} noInline>
-          <LiveEditor
-            onChange={setCode}
-            className="bg-gray-800 rounded-lg p-4"
-          />
+          <div onBlur={handleBlur}>
+            <LiveEditor style={{ fontFamily: 'monospace', fontSize: '1.2rem' }}
+              className="bg-gray-800 rounded-lg p-4"
+            />
+          </div>
           <button
             className="bg-amber-500 rounded-lg px-3 py-1 text-xl font-bold my-5"
             onClick={handleRunCode}
@@ -70,8 +92,8 @@ const CodeEditorLive = ({
             <div>
               <label className="text-amber-500 font-bold">Prueba</label>
               <textarea
-                className="w-full bg-gray-800  p-2 mt-2 text-white"
-                value={output}
+                className="w-full bg-gray-800 p-2 mt-2 text-white"
+                value={output} // Usar defaultValue en lugar de dangerouslySetInnerHTML
                 readOnly
                 rows={Math.min(Math.max(countLines(output), 1), 20)}
                 cols={50}
@@ -82,6 +104,8 @@ const CodeEditorLive = ({
                   scrollbarColor: "#4A5568 #2D3748",
                 }}
               />
+
+              {/* <pre>{JSON.stringify(output, null, 2)}</pre> */}
             </div>
             <div>
               <label className="text-amber-500 font-bold">Correcto</label>
@@ -106,7 +130,6 @@ const CodeEditorLive = ({
               />
             </div>
           </div>
-          <LivePreview />
         </LiveProvider>
       </div>
     </div>
