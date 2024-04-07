@@ -1,15 +1,14 @@
+
+// Esta funcion se encarga de comparar el codigo del usuario con la respuesta que está en el backend
 export function fusionAndCompare(value1, value2) {
-  // Verificar si los tipos de datos son iguales
   if (typeof value1 !== typeof value2) {
     return false;
   }
 
-  // Caso: Variables primitivas
   if (typeof value1 !== "object") {
     return value1 === value2;
   }
 
-  // Caso: Arrays
   if (Array.isArray(value1)) {
     if (value1.length !== value2.length) {
       return false;
@@ -22,7 +21,6 @@ export function fusionAndCompare(value1, value2) {
     return true;
   }
 
-  // Caso: Objetos
   if (typeof value1 === "object" && !Array.isArray(value1)) {
     const keys1 = Object.keys(value1);
     const keys2 = Object.keys(value2);
@@ -38,6 +36,32 @@ export function fusionAndCompare(value1, value2) {
   }
 }
 
+
+// Esta funcion cuenta las lineas utilizadas para la consola de los resultados
 export function countLines(text) {
   return text.split("\n").length;
+}
+
+
+//Esta funcion transforma los tipos de los datos que llegan del servidor
+export const transformData = (value) => {
+  if (value.startsWith('[')) {
+    const newValue = JSON.parse(value)
+    return newValue
+  }
+  else {
+    if (!isNaN(value) && !isNaN(parseInt(value))) {
+      return parseInt(value);
+    }
+    if (!isNaN(value) && !isNaN(parseFloat(value))) {
+      return parseFloat(value);
+    }
+    if (value === "true") {
+      return true;
+    }
+    if (value === "false") {
+      return false;
+    }
+    return value;
+  }
 }
