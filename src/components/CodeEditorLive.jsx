@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import { LiveProvider, LiveEditor, LivePreview, LiveError } from "react-live";
 import { fusionAndCompare, countLines } from "../helpers";
+import Prettier from 'prettier/standalone';
+import ParserHtml from 'prettier/parser-html';
+import ParserBabel from 'prettier/parser-babel';
+
+const formatCode = (code) => {
+  return Prettier.format(code, {
+    parser: 'babel',
+    plugins: [ParserHtml, ParserBabel],
+    tabWidth: 2,
+    singleQuote: true,
+  });
+};
 
 const CodeEditorLive = ({
-  initialConfig,
-  values,
-  answer,
-  description,
-  title,
   level,
   points,
+  title,
+  description,
+  initialConfig,
+  answer,
+  values
 }) => {
   const data = values;
   const [code, setCode] = useState(initialConfig);
@@ -76,7 +88,7 @@ const CodeEditorLive = ({
         </div>
       </div>
       <div className="lg:w-1/2 w-full">
-        <LiveProvider code={code} noInline>
+        <LiveProvider code={code} noInline transformCode={formatCode}>
           <div onBlur={handleBlur}>
             <LiveEditor style={{ fontFamily: 'monospace', fontSize: '1.2rem' }}
               className="bg-gray-800 rounded-lg p-4"
