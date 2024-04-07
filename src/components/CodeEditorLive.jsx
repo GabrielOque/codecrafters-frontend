@@ -1,18 +1,7 @@
 import React, { useState } from "react";
 import { LiveProvider, LiveEditor, LivePreview, LiveError } from "react-live";
 import { fusionAndCompare, countLines } from "../helpers";
-import Prettier from 'prettier/standalone';
-import ParserHtml from 'prettier/parser-html';
-import ParserBabel from 'prettier/parser-babel';
 
-const formatCode = (code) => {
-  return Prettier.format(code, {
-    parser: 'babel',
-    plugins: [ParserHtml, ParserBabel],
-    tabWidth: 2,
-    singleQuote: true,
-  });
-};
 
 const CodeEditorLive = ({
   level,
@@ -54,16 +43,16 @@ const CodeEditorLive = ({
   };
 
   const handleBlur = (event) => {
-    const editorValue = event.target.textContent; // Obtener el contenido del editor
-    const lines = editorValue.split('\n'); // Dividir el texto en líneas
+    const editorValue = event.target.textContent;
+    const lines = editorValue.split('\n');
 
-    // Eliminar la última línea si está vacía (es decir, si es un salto de línea)
+
     if (lines[lines.length - 1].trim() === '') {
-      lines.pop(); // Eliminar la última línea
+      lines.pop();
     }
 
-    const newValue = lines.join('\n'); // Unir las líneas nuevamente en un solo texto
-    setCode(() => newValue); // Actualizar el estado con el valor del editor
+    const newValue = lines.join('\n');
+    setCode(() => newValue);
   };
 
 
@@ -88,7 +77,7 @@ const CodeEditorLive = ({
         </div>
       </div>
       <div className="lg:w-1/2 w-full">
-        <LiveProvider code={code} noInline transformCode={formatCode}>
+        <LiveProvider code={code} noInline>
           <div onBlur={handleBlur}>
             <LiveEditor style={{ fontFamily: 'monospace', fontSize: '1.2rem' }}
               className="bg-gray-800 rounded-lg p-4"
@@ -105,7 +94,7 @@ const CodeEditorLive = ({
               <label className="text-amber-500 font-bold">Prueba</label>
               <textarea
                 className="w-full bg-gray-800 p-2 mt-2 text-white"
-                value={output} // Usar defaultValue en lugar de dangerouslySetInnerHTML
+                value={output}
                 readOnly
                 rows={Math.min(Math.max(countLines(output), 1), 20)}
                 cols={50}
@@ -116,8 +105,6 @@ const CodeEditorLive = ({
                   scrollbarColor: "#4A5568 #2D3748",
                 }}
               />
-
-              {/* <pre>{JSON.stringify(output, null, 2)}</pre> */}
             </div>
             <div>
               <label className="text-amber-500 font-bold">Correcto</label>
