@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { LiveProvider, LiveEditor } from "react-live";
 import { fusionAndCompare } from "../helpers"
+import TerminalComponent from "./TerminalComponent";
+import OutputTestComponent from "./OutputTestComponent";
+import RunButtonComponent from "./RunButtonComponent";
 
 
 const CodeEditorLive = ({
@@ -17,6 +20,7 @@ const CodeEditorLive = ({
   const [code, setCode] = useState(initialConfig);
   const [resultTest, setResultTest] = useState(false);
   const [consoleOutput, setConsoleOutput] = useState(null);
+  const [isCorrectTest, setIsCorrectTest] = useState(false);
 
   const handleRunCode = () => {
     try {
@@ -27,6 +31,7 @@ const CodeEditorLive = ({
 
       if (fusionAndCompare(returnFunction, answer)) {
         setResultTest(true);
+        setIsCorrectTest(true);
       }
       else {
         setResultTest(false);
@@ -51,8 +56,6 @@ const CodeEditorLive = ({
     setCode(() => newValue);
   };
 
-
-
   return (
     <div className="mb-36 w-full flex flex-col items-center">
       <div className="lg:w-1/2 w-full text-white text-xl font-bold">
@@ -72,29 +75,20 @@ const CodeEditorLive = ({
         <div className="w-full text-center mb-2 ">
           <i className="fas fa-arrow-down text-4xl text-amber-500 cursor-pointer inline-block animate-bounce" />
         </div>
-        <pre>
-          {!consoleOutput ? ">" :
-            typeof consoleOutput === 'object' ?
-              `>${JSON.stringify(consoleOutput, null, 2)}` :
-              `>${consoleOutput}`
-          }
-        </pre>
       </div>
       <div className="lg:w-1/2 w-full">
         <LiveProvider code={code} noInline>
           <div onBlur={handleBlur}>
-            <LiveEditor style={{ fontFamily: 'monospace', fontSize: '1.2rem' }}
+            <LiveEditor style={{ fontFamily: 'monospace', fontSize: '1.6rem' }}
               className="bg-gray-800 rounded-lg p-4"
             />
           </div>
-          <button
-            className="bg-amber-500 rounded-lg px-3 py-1 text-xl font-bold my-5"
-            onClick={handleRunCode}
-          >
-            Ejecutar
-          </button>
+          <div>
+            <RunButtonComponent handleRunCode={handleRunCode} topic="Ejecutar" isCorrectTest={isCorrectTest} />
+          </div>
           <div className="w-full flex gap-x-4">
-            <textarea readOnly value={resultTest ? "Los test pasaron" : "Los test no pasaron"} />
+            <OutputTestComponent resultTest={resultTest} />
+            <TerminalComponent consoleOutput={consoleOutput} />
           </div>
         </LiveProvider>
       </div>
