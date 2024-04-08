@@ -43,9 +43,15 @@ const Home = () => {
   }, [])
 
   return (
-    <div className="w-full  flex flex-col items-center  px-20 gap-x-20 mt-20">
+    <div className="w-full  flex flex-col items-center  px-10 gap-x-10 mt-20">
+      <div className="text-amber-500 text-6xl mb-20 font-bold flex justify-center w-full">
+        <marquee className="w-1/2 py-3 cursor-pointer" onClick={() => alert("Compado")}>
+          <i className="fa-solid fa-gift pr-4" />
+          Pancarta publicitaria
+        </marquee>
+      </div>
 
-      <input
+      {/* <input
         type="text"
         name="lavel"
         value={inputValues.lavel}
@@ -58,7 +64,7 @@ const Home = () => {
       <textarea name="answer" rows={10} value={inputValues.answer} onChange={handleInputChange} placeholder="Respuesta" />
       <textarea name="values" rows={10} value={inputValues.values} onChange={handleInputChange} placeholder="Valores" />
       <textarea value={inputValues.initialConfig} name="initialConfig" className="w-[300px]" rows={5} placeholder="Aqui se pone el codigo que se sube " onChange={handleInputChange} />
-      <button className="bg-amber-500 rounded-lg px-3 py-1 text-xl font-bold my-5" onClick={createChallenge}>Subir</button>
+      <button className="bg-amber-500 rounded-lg px-3 py-1 text-xl font-bold my-5" onClick={createChallenge}>Subir</button> */}
 
 
       {challengers.reverse().map((challenge) => (
