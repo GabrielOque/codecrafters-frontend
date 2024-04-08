@@ -32,6 +32,7 @@ export function fusionAndCompare(value1, value2) {
         return false;
       }
     }
+
     return true;
   }
 }
@@ -43,25 +44,26 @@ export function countLines(text) {
 }
 
 
-//Esta funcion transforma los tipos de los datos que llegan del servidor
+// Esta función transforma los tipos de los datos que llegan del servidor
 export const transformData = (value) => {
   if (value.startsWith('[')) {
-    const newValue = JSON.parse(value)
-    return newValue
+    return JSON.parse(value);
   }
-  else {
-    if (!isNaN(value) && !isNaN(parseInt(value))) {
-      return parseInt(value);
-    }
-    if (!isNaN(value) && !isNaN(parseFloat(value))) {
-      return parseFloat(value);
-    }
-    if (value === "true") {
-      return true;
-    }
-    if (value === "false") {
-      return false;
-    }
-    return value;
+  else if (value.startsWith('{')) {
+    return JSON.parse(value);
   }
-}
+  else if (!isNaN(value) && !isNaN(parseInt(value))) {
+    return parseInt(value);
+  }
+  else if (!isNaN(value) && !isNaN(parseFloat(value))) {
+    return parseFloat(value);
+  }
+  else if (value === "true") {
+    return true;
+  }
+  else if (value === "false") {
+    return false;
+  }
+  return value;
+};
+

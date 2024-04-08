@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { LiveProvider, LiveEditor, LivePreview, LiveError } from "react-live";
-import { fusionAndCompare, countLines } from "../helpers";
+import { LiveProvider, LiveEditor } from "react-live";
+import { fusionAndCompare } from "../helpers"
 
 
 const CodeEditorLive = ({
@@ -8,39 +8,35 @@ const CodeEditorLive = ({
   points,
   title,
   description,
-  initialConfig,
   answer,
+  initialConfig,
   values
 }) => {
+
   const data = values;
   const [code, setCode] = useState(initialConfig);
-  const [output, setOutput] = useState("");
-  const [originalData, setOriginalData] = useState();
+  const [resultTest, setResultTest] = useState(false);
+  const [consoleOutput, setConsoleOutput] = useState(null);
 
   const handleRunCode = () => {
     try {
-      let capturedOutput = "";
-      const originalLog = console.log;
       console.log = (message) => {
-        if (typeof message === "object" || Array.isArray(message)) {
-          capturedOutput += JSON.stringify(message, null, 2);
-          setOriginalData(() => message);
-        }
-        else {
-          capturedOutput += `${message}`;
-          setOriginalData(() => message);
-        }
+        setConsoleOutput(message);
       };
+      const returnFunction = eval(`(${code})(data)`)
 
-      eval(code);
+      if (fusionAndCompare(returnFunction, answer)) {
+        setResultTest(true);
+      }
+      else {
+        setResultTest(false);
+      }
 
-      console.log = originalLog;
-
-      setOutput(() => capturedOutput);
     } catch (error) {
-      console.error("Error al ejecutar el código:", error);
+      setConsoleOutput(error.message);
     }
   };
+
 
   const handleBlur = (event) => {
     const editorValue = event.target.textContent;
@@ -54,6 +50,7 @@ const CodeEditorLive = ({
     const newValue = lines.join('\n');
     setCode(() => newValue);
   };
+
 
 
   return (
@@ -75,6 +72,13 @@ const CodeEditorLive = ({
         <div className="w-full text-center mb-2 ">
           <i className="fas fa-arrow-down text-4xl text-amber-500 cursor-pointer inline-block animate-bounce" />
         </div>
+        <pre>
+          {!consoleOutput ? ">" :
+            typeof consoleOutput === 'object' ?
+              `>${JSON.stringify(consoleOutput, null, 2)}` :
+              `>${consoleOutput}`
+          }
+        </pre>
       </div>
       <div className="lg:w-1/2 w-full">
         <LiveProvider code={code} noInline>
@@ -90,44 +94,7 @@ const CodeEditorLive = ({
             Ejecutar
           </button>
           <div className="w-full flex gap-x-4">
-            <div>
-              <label className="text-amber-500 font-bold">Prueba</label>
-              <textarea
-                className="w-full bg-gray-800 p-2 mt-2 text-white"
-                value={output}
-                readOnly
-                rows={Math.min(Math.max(countLines(output), 1), 20)}
-                cols={50}
-                style={{
-                  maxHeight: "20em",
-                  overflowY: "auto",
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "#4A5568 #2D3748",
-                }}
-              />
-            </div>
-            <div>
-              <label className="text-amber-500 font-bold">Correcto</label>
-              <textarea
-                className="w-full bg-gray-800 p-2 mt-2 text-white resize-none"
-                value={
-                  originalData
-                    ? fusionAndCompare(originalData, answer)
-                      ? output
-                      : "No es correcto"
-                    : ""
-                }
-                readOnly
-                rows={Math.min(Math.max(countLines(output), 1), 20)}
-                cols={50}
-                style={{
-                  maxHeight: "20em",
-                  overflowY: "auto",
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "#4A5568 #2D3748",
-                }}
-              />
-            </div>
+            <textarea readOnly value={resultTest ? "Los test pasaron" : "Los test no pasaron"} />
           </div>
         </LiveProvider>
       </div>
